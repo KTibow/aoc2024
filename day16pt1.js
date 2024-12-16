@@ -26,7 +26,7 @@ for (let y = 0; y < grid.length; y++) {
 }
 
 const heuristicEnd = (x, y) => {
-  return (x - finish[0]) ** 2 + (y - finish[0]) ** 2;
+  return (x - finish[0]) ** 2 + (y - finish[1]) ** 2; // fix 1: fix the coords
 };
 
 openSet.add(`${start[0]},${start[1]},E`);
@@ -88,11 +88,11 @@ while (openSet.size > 0) {
     `${+x + vector[0]},${+y + vector[1]},${d}`,
   ]) {
     if (neighbor == best) continue;
-    const [x, y, thisD] = best.split(",");
+    const [x, y, thisD] = neighbor.split(","); // fix 3: get data for the neighbor, not the best
     if (grid[+y][+x] == "#") continue;
 
     // cost from start to n
-    const expectedGScore = bestScore + (thisD == d ? 1 : 1000);
+    const expectedGScore = gScoreMap[best] + (thisD == d ? 1 : 1000); // fix 2: don't double count the heuristic
     if (!(neighbor in gScoreMap) || expectedGScore < gScoreMap[neighbor]) {
       cameFrom[neighbor] = best;
       gScoreMap[neighbor] = expectedGScore;
