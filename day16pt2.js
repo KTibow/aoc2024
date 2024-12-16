@@ -3,6 +3,7 @@ const input = await readFile("day16input.txt", "utf8");
 const grid = input.split("\n").map((l) => [...l]);
 
 const openSet = new Set();
+const archiveSet = new Set();
 const cameFrom = {};
 
 // cost from start to n
@@ -43,29 +44,8 @@ while (openSet.size > 0) {
   }
 
   if (+best.split(",")[0] == finish[0] && +best.split(",")[1] == finish[1]) {
-    console.log("!");
-    console.log(best);
-    console.log(bestScore);
-
-    const squares = new Set();
-    const lookAt = (place) => {
-      const [x, y] = place.split(",");
-      squares.add(`${x},${y}`);
-
-      if (!cameFrom[place]) {
-        console.log("ending at", place);
-        return;
-      }
-      for (const p of cameFrom[place]) {
-        lookAt(p);
-      }
-    };
-    lookAt(best);
-    console.log(squares);
-    break;
+    archiveSet.add(best);
   }
-
-  // console.log("looking at", best);
   openSet.delete(best);
 
   const [x, y, d] = best.split(",");
@@ -96,3 +76,37 @@ while (openSet.size > 0) {
     }
   }
 }
+let best;
+let bestScore = Infinity;
+for (const [k, v] of Object.entries(fScoreMap)) {
+  if (!k.startsWith(`${finish[0]},${finish[1]},`)) continue;
+  if (v < bestScore) {
+    best = k;
+    bestScore = v;
+  }
+}
+console.log("!");
+console.log(best);
+console.log(bestScore);
+
+const squares = new Set();
+const lookAt = (place) => {
+  const [x, y] = place.split(",");
+  squares.add(`${x},${y}`);
+
+  if (!cameFrom[place]) {
+    return;
+  }
+  for (const p of cameFrom[place]) {
+    lookAt(p);
+  }
+};
+lookAt(best);
+console.log(
+  grid
+    .map((row, y) =>
+      row.map((_, x) => (squares.has(`${x},${y}`) ? "X" : " ")).join("")
+    )
+    .join("\n")
+);
+console.log(squares.size);
